@@ -1,5 +1,32 @@
 <?php
 
+abstract class FieldType{
+	const STRING = 1;
+	const TEXT = 2;
+	const INTEGER = 3;
+	const DECIMAL = 4;
+	const MONEY = 5;
+	const BIGINT = 6;
+	const BOOLEAN = 7;
+	const DATETIME = 8;
+	const INTLIST = 9;
+}
+
+abstract class FieldConstraint{
+	const NONE = 1;
+	const RECOMMENDED = 2;
+	const REQUIRED = 3;
+}
+
+abstract class LookupType{
+	const NONE = 0;
+	const LOOKUPLIST = 1;
+	const TABLEVIEW = 2;
+	const USERLIST = 3;
+	const GROUPLIST = 4;
+	const MULTISELECTLIST = 5;
+}
+
 class appactiv{
 
 	var $_serverKey;
@@ -16,9 +43,10 @@ class appactiv{
 		$this->_userKey = $userKey;
 	}
 
-	public function search($entity, Array $params = null){
+	public function search($entity, Array $params = null, $page = 1, $perpage = 10, $sortorder = "id"){
 		$data = $params == null ? "" : json_encode($params);
-		$result = $this->executeRequest($entity, 'GET', $data);
+		$query = http_build_query(array("page" => $page, "perpage" => $perpage, "sortorder" => $sortorder));
+		$result = $this->executeRequest($entity.'?'.$query, 'GET', $data);
 		return $result ? json_decode($result, true) : false;
 	}
 
@@ -40,6 +68,20 @@ class appactiv{
 	public function delete($entity, $id){
 		$result = $this->executeRequest($entity.'/'.$id, 'DELETE');
 		return $result ? true : false;
+	}
+	public function count($entity){
+		$result = $this->executeRequest($entity.'/count', 'GET');
+		return $result ? json_decode($result, true) : false;
+	}
+
+	public function lookups($entity, $fieldname){
+		$result = $this->executeRequest($entity.'/Lookups?fieldname='.$fieldname, 'GET');
+		return $result ? json_decode($result, true) : false;
+	}
+
+	public function fields($entity){
+		$result = $this->executeRequest($entity.'/Fields', 'GET');
+		return $result ? json_decode($result, true) : false;	
 	}
 
 

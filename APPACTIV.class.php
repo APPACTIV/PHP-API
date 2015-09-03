@@ -44,9 +44,8 @@ class appactiv{
 	}
 
 	public function search($entity, Array $params = null, $page = 1, $perpage = 10, $sortorder = "id"){
-		$data = $params == null ? "" : json_encode($params);
-		$query = http_build_query(array("page" => $page, "perpage" => $perpage, "sortorder" => $sortorder));
-		$result = $this->executeRequest($entity.'?'.$query, 'GET', $data);
+		$query = http_build_query(array_merge(array("page" => $page, "perpage" => $perpage, "sortorder" => $sortorder), $params));
+		$result = $this->executeRequest($entity.'?'.$query, 'GET');
 		return $result ? json_decode($result, true) : false;
 	}
 
